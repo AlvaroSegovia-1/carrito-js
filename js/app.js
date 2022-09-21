@@ -10,6 +10,16 @@ cargarEventListeners();
 function cargarEventListeners() {
   // Cuando agregas un curso presionando "Agregar al Carrito"
   listaCursos.addEventListener("click", agregarCurso);
+
+  // Elimina cursos del carrito
+  carrito.addEventListener("click", eliminarCurso);
+
+  // Vaciar el carrito
+  vaciarCarritoBtn.addEventListener("click", () => {
+    //console.log('vaciando carrito')
+    articulosCarrito = []; // reseteamos el arreglo
+    limpiarHTML(); // Eliminamos todo el html
+  });
 }
 
 // Funciones
@@ -21,6 +31,40 @@ function agregarCurso(e) {
     leerDatosCurso(cursoSeleccionado);
   }
 }
+
+// Elimina un curso del carrito
+function eliminarCurso(e) {
+  e.preventDefault();
+  if (e.target.classList.contains("borrar-curso")) {
+    // e.target.parentElement.parentElement.remove();
+    const cursoId = e.target.getAttribute("data-id");
+
+    // Elimina del arreglo de articulosCarrito por el data-id
+    articulosCarrito = articulosCarrito.filter(curso => curso.id !== cursoId);
+
+    // articulosCarrito = articulosCarrito.filter(curso => curso.id !== cursoId);
+
+    //* No funciona bien filter u otra cosa , elimina todos los articulos
+    console.log(articulosCarrito);
+
+    // Iterar sobre el carrito y mostrar su html
+    carritoHTML();
+  }
+}
+
+/* // Elimina el curso del carrito en el DOM
+function eliminarCurso(e) {
+  e.preventDefault();
+  if (e.target.classList.contains("borrar-curso")) {
+    // e.target.parentElement.parentElement.remove();
+    const cursoId = e.target.getAttribute("data-id");
+
+    // Eliminar del arreglo del carrito
+    articulosCarrito = articulosCarrito.filter(curso => curso.id !== cursoId);
+
+    carritoHTML();
+  }
+} */
 
 // Lee el contenido del HTML al que le dimos click y extrae la información del curso
 function leerDatosCurso(curso) {
@@ -34,8 +78,24 @@ function leerDatosCurso(curso) {
     id: curso.querySelector("a").getAttribute("data-id"),
     cantidad: 1,
   };
-  // Agrega elementos al arreglo de carrito
-  articulosCarrito = [...articulosCarrito, infoCurso];
+  // Revisa si un elemento ya existe en el carrito
+  const existe = articulosCarrito.some(curso => curso.id === infoCurso.id);
+  if (existe) {
+    // Actualizamos la cantidad
+    const cursos = articulosCarrito.map(curso => {
+      if (curso.id === infoCurso.id) {
+        curso.cantidad++;
+        return curso; // retorna el objeto actualizado
+      } else {
+        return curso; // retorna los objetos que no son los duplicados
+      }
+    });
+    articulosCarrito = [...cursos];
+  } else {
+    // Agrega elementos al arreglo de carrito
+    articulosCarrito = [...articulosCarrito, infoCurso];
+  }
+
   console.log(articulosCarrito);
   carritoHTML();
 }
